@@ -3,6 +3,22 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  let deferredPrompt: any;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('beforeinstallprompt');
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+  const installApp = async () => {
+    if (deferredPrompt !== null) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((outcome: any) => {
+        if (outcome === 'accepted') {
+          deferredPrompt = null;
+        }
+      });
+    }
+  }
   return (
     <div className="App">
       <header className="App-header">
@@ -24,6 +40,13 @@ function App() {
         >
           Learn React
         </a>
+        <button
+          className='install-button'
+          onClick={installApp}
+          disabled={deferredPrompt === null}
+        >
+          install pwa
+        </button>
       </header>
     </div>
   );
